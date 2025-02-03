@@ -1,0 +1,36 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+abstract class ChatMessage {
+    + abstract @Composable content()
+    + abstract @Composable onReplying()
+    + abstract @Composable onReply()
+    + messageTime: LocalDateTime
+    + messageStatus: MessageStatus,
+    + owner: Owner,
+}
+
+class TextMessage extends ChatMessage
+class VoiceMessage extends ChatMessage
+class ImageMessage extends ChatMessage
+    class DrawingMessage extends ImageMessage
+class VideoMessage extends ChatMessage
+class MultipleMediaMessage extends ChatMessage
+class StickerMessage extends ChatMessage
+
+
+
+abstract class Owner {
+    name: String,
+}
+class Me extends Owner
+class Other extends Owner
+
+enum MessageStatus {
+    SAVED,
+    SENT,
+    RECEIVED,
+    READ
+}
+
+@enduml

@@ -1,0 +1,40 @@
+package com.techullurgy.retest.voicerecorder
+
+import android.content.Context
+import android.media.MediaPlayer
+import androidx.core.net.toUri
+import java.io.File
+
+interface AudioPlayer {
+    fun playFile(file: File)
+    fun pause()
+    fun resume()
+    fun stop()
+}
+
+class AndroidAudioPlayer(
+    private val context: Context
+): AudioPlayer {
+    private var player: MediaPlayer? = null
+
+    override fun playFile(file: File) {
+        MediaPlayer.create(context, file.toUri()).apply {
+            player = this
+            start()
+        }
+    }
+
+    override fun pause() {
+        TODO("Not yet implemented")
+    }
+
+    override fun resume() {
+        TODO("Not yet implemented")
+    }
+
+    override fun stop() {
+        player?.stop()
+        player?.release()
+        player = null
+    }
+}
