@@ -2,6 +2,7 @@ package com.techullurgy.openglsample
 
 import android.content.Context
 import android.opengl.GLSurfaceView
+import kotlin.math.abs
 
 class OpenGLSurfaceView(context: Context) : GLSurfaceView(context) {
     private val renderer = RubiksCubeRenderer()
@@ -11,11 +12,6 @@ class OpenGLSurfaceView(context: Context) : GLSurfaceView(context) {
         setRenderer(renderer)
 
         renderMode = RENDERMODE_WHEN_DIRTY
-    }
-
-    fun resetCameraPosition() {
-        renderer.resetCameraPosition()
-        requestRender()
     }
 
     fun rotateCameraX(angle: Float) {
@@ -33,18 +29,19 @@ class OpenGLSurfaceView(context: Context) : GLSurfaceView(context) {
         requestRender()
     }
 
-    fun xTurn(index: Int, dir: Int) {
-        renderer.turnX(index, dir)
+    fun turn(move: Move) {
+        if(abs(move.x) > 0) {
+            renderer.turnX(move.x, move.dir)
+        } else if(abs(move.y) > 0) {
+            renderer.turnY(move.y, move.dir)
+        } else if(abs(move.z) > 0) {
+            renderer.turnZ(move.z, move.dir)
+        }
         requestRender()
     }
 
-    fun yTurn(index: Int, dir: Int) {
-        renderer.turnY(index, dir)
-        requestRender()
-    }
-
-    fun zTurn(index: Int, dir: Int) {
-        renderer.turnZ(index, dir)
+    fun animateTurn(move: Move, angle: Float) {
+        renderer.updateCurrentMove(move, angle)
         requestRender()
     }
 }

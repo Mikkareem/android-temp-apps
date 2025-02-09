@@ -12,6 +12,7 @@ import dev.romainguy.kotlin.math.Float2
 import dev.romainguy.kotlin.math.Float3
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
+import kotlin.math.abs
 import kotlin.properties.Delegates
 
 class RubiksCubeRenderer: Renderer {
@@ -27,6 +28,8 @@ class RubiksCubeRenderer: Renderer {
     private var worldRotationX = 0f
     private var worldRotationY = 0f
     private var worldRotationZ = 0f
+
+    private var currentMove: Move? = null
 
     fun rotateCameraX(angle: Float) {
         if(isStarted) {
@@ -46,14 +49,6 @@ class RubiksCubeRenderer: Renderer {
         }
     }
 
-    fun resetCameraPosition() {
-        if(isStarted) {
-            worldRotationX = 0f
-            worldRotationY = 0f
-            worldRotationZ = 0f
-        }
-    }
-
     private fun render() {
         Transformation.push()
         Transformation.rotateX(worldRotationX)
@@ -62,6 +57,15 @@ class RubiksCubeRenderer: Renderer {
         cubes
             .forEach { cube ->
                 Transformation.push()
+                currentMove?.let {
+                    if(abs(cube.x) > 0 && cube.x == it.x) {
+                        Transformation.rotateX(it.dir * it.angle)
+                    } else if(abs(cube.y) > 0 && cube.y == it.y) {
+                        Transformation.rotateY(-1f * it.dir * it.angle)
+                    } else if(abs(cube.z) > 0 && cube.z == it.z) {
+                        Transformation.rotateZ(it.dir * it.angle)
+                    }
+                }
                 cube.draw()
                 Transformation.pop()
             }
@@ -69,6 +73,7 @@ class RubiksCubeRenderer: Renderer {
     }
 
     fun turnX(index: Int, dir: Int) {
+        currentMove = null
         cubes
             .filter { it.x == index }
             .forEach { cube ->
@@ -79,6 +84,7 @@ class RubiksCubeRenderer: Renderer {
     }
 
     fun turnY(index: Int, dir: Int) {
+        currentMove = null
         cubes
             .filter { it.y == index }
             .forEach { cube ->
@@ -89,6 +95,7 @@ class RubiksCubeRenderer: Renderer {
     }
 
     fun turnZ(index: Int, dir: Int) {
+        currentMove = null
         cubes
             .filter { it.z == index }
             .forEach { cube ->
@@ -126,5 +133,12 @@ class RubiksCubeRenderer: Renderer {
         GLES32.glClear(GLES32.GL_COLOR_BUFFER_BIT or GLES32.GL_DEPTH_BUFFER_BIT)
         render()
         Transformation.clearAll()
+    }
+
+    fun updateCurrentMove(move: Move, angle: Float) {
+        if(currentMove == null) {
+            currentMove = move.copy()
+        }
+        currentMove!!.update(angle)
     }
 }
